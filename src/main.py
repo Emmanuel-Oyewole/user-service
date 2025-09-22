@@ -1,13 +1,29 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config.settings import settings
+from src.config.database import sessionmanager
+from src.config.cache import redis_manager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Application lifespan context manager
+    """
+    await redis_manager.connect()
+    yield
+    if sessionmanager._engine is not None:
+        await sessionmanager.close()
+    await redis_manager.close()
 
 
 app = FastAPI(
-    title=settings.service_mode,
+    title=settings.SERVICE_NAME,
+    debug=settings.DEBUG,
+    lifespan=lifespan
 )
 
-# Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,14 +33,10 @@ app.add_middleware(
 )
 
 
-
 @app.get("/")
 async def root():
     """Root endpoint with basic API information."""
-    return {
-        "message": "Welcome to User-service",
-        "status": "active"
-    }
+    return {"message": "Welcome to User-service", "status": "active"}
 
 
 @app.get("/health")
