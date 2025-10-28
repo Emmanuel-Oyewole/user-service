@@ -21,11 +21,7 @@ async def lifespan(app: FastAPI):
     await shut_down()
 
 
-app = FastAPI(
-    title=settings.SERVICE_NAME,
-    debug=settings.DEBUG,
-    lifespan=lifespan
-)
+app = FastAPI(title=settings.SERVICE_NAME, debug=settings.DEBUG, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,3 +56,5 @@ async def root():
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+app.include_router(user_preference_router)
