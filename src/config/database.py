@@ -9,13 +9,12 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import DeclarativeBase
 
 from .settings import settings
-import logging
+from src.utils.logging import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
-engine = create_async_engine(settings.sqlalchemy_database_uri, echo=settings.DEBUG)
-SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
+# engine = create_async_engine(settings.sqlalchemy_database_uri, echo=settings.DEBUG)
+# SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 class Base(DeclarativeBase):
