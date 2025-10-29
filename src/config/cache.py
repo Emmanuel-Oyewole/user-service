@@ -1,11 +1,11 @@
+import json
 from redis import asyncio as aioredis
 from redis.asyncio import Redis
-from typing import Optional
-from .settings import settings
-import logging
+from typing import Any, Optional
+from src.config.settings import settings
+from src.utils.logging import get_logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class RedisConnectionManager:
@@ -17,6 +17,7 @@ class RedisConnectionManager:
 
     def __init__(self, host: str):
         self._host = host
+        self._redis_client: Optional[Redis] = None
 
     async def connect(self) -> None:
         """
@@ -49,6 +50,37 @@ class RedisConnectionManager:
         await self._redis_client.close()
         self._redis_client = None
         logger.info("Connection to Redis closed.")
+    
+    async def get(self, key: str) -> Optional[Any]:
+        """ Get value from Cache"""
+        if self._redis_client is None:
+            logger.warning("Redis client is not initialized, nothing to get.")
+            return
+        value = await self._redis_client.get(key)
+        if value:
+            return json.loads(value)
+        return None
+    
+    async def set(self, key: str, value: Any, expire: int = 300) -> None:
+        """ Set value in Cache"""
+        if self._redis_client is None:
+            logger.warning("Redis client is not initialized, nothing to set.")
+            return
+        await self._redis_client.set(key, json.dumps(value), ex=expire)
+    
+    async def delete(self, key: str) -> None:
+        """ Delete value from Cache"""
+        if self._redis_client is None:
+            logger.warning("Redis client is not initialized, nothing to delete.")
+            return
+        await self._redis_client.delete(key)
+
+    async def exists (self, key: str) -> bool:
+        """ Check if key exists in Cache"""
+        if self._redis_client is None:
+            logger.warning("Redis client is not initialized, nothing to check.")
+            return False
+        return await self._redis_client.exists(key)
 
     def get_client(self) -> Redis:
         """
