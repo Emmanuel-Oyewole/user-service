@@ -5,6 +5,7 @@ from src.config.settings import settings
 from src.config.database import sessionmanager
 from src.config.cache import redis_manager
 from src.routes.user_preference_settings import router as user_preference_router
+from src.routes.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -42,3 +43,4 @@ async def health_check():
     return {"status": "healthy"}
 
 app.include_router(user_preference_router)
+app.include_router(auth_router)
