@@ -38,7 +38,7 @@ class AuthService:
             AuthResponse with user data and tokens
         """
         # Create user
-        user = self.auth_repo.create_user(
+        user = await self.auth_repo.create_user(
             email=data.email,
             password=data.password,
             first_name=data.first_name,
@@ -100,7 +100,7 @@ class AuthService:
             AuthResponse with user data and tokens
         """
         # Authenticate user
-        user = self.auth_repo.authenticate_user(data.email, data.password)
+        user = await self.auth_repo.authenticate_user(data.email, data.password)
 
         # Generate tokens
         tokens = SecurityManager.create_tokens_for_user(
@@ -174,7 +174,7 @@ class AuthService:
                     raise InvalidTokenException("Invalid refresh token")
 
             # Get user
-            user = self.auth_repo.get_user_by_id(UUID(user_id))
+            user = await self.auth_repo.get_user_by_id(UUID(user_id))
             if not user:
                 raise InvalidCredentialsException("User not found")
 
@@ -229,5 +229,3 @@ class AuthService:
             await self.redis_client.delete(f"user:{user_id}")
 
         return True
-    
-    

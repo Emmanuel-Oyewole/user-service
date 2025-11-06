@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from ..config.database import Base
+from src.config.database import Base
 
 
 class ConsentType(str, enum.Enum):
