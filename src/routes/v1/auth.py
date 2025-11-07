@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 import redis.asyncio as redis
 from src.config.database import get_db_session
 from src.config.cache import get_redis_client
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 def get_auth_service(
-    db: Session = Depends(get_db_session),
+    db: AsyncSession = Depends(get_db_session),
     redis_client: redis.Redis = Depends(get_redis_client),
 ) -> AuthService:
     """Dependency to get AuthService instance"""
